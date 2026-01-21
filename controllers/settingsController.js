@@ -75,11 +75,11 @@ const getCompanyProfile = async (req, res) => {
 // @access  Private/Admin
 const updateCompanyProfile = async (req, res) => {
     try {
-        const { name, address, phone, email, website } = req.body;
+        const { name, address, phone, email, website, upiId, upiName, enableQrPayments } = req.body;
 
         const profile = await CompanyProfile.findOneAndUpdate(
             { tenantId: req.user.tenantId },
-            { $set: { name, address, phone, email, website } },
+            { $set: { name, address, phone, email, website, upiId, upiName, enableQrPayments } },
             { new: true, upsert: true }
         );
 

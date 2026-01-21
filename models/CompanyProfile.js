@@ -27,6 +27,18 @@ const companyProfileSchema = new mongoose.Schema({
     website: {
         type: String,
         default: ''
+    },
+    upiId: {
+        type: String,
+        default: ''
+    },
+    upiName: {
+        type: String,
+        default: ''
+    },
+    enableQrPayments: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true

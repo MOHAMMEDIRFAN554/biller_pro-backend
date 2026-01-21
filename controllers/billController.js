@@ -25,6 +25,19 @@ const createBill = async (req, res) => {
             return;
         }
 
+        // Pre-deduction Stock Check
+        for (const item of items) {
+            const product = await Product.findById(item.product);
+            if (!product) {
+                res.status(404).json({ message: `Product ${item.name} not found` });
+                return;
+            }
+            if (product.stock < item.quantity) {
+                res.status(400).json({ message: `Insufficient stock for ${product.name}. Available: ${product.stock}` });
+                return;
+            }
+        }
+
 
 
         // Calculate Paid (Cash/Online)
