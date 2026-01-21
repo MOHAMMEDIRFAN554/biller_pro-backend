@@ -30,11 +30,19 @@ const getDashboardStats = async (req, res) => {
             .select('name stock price')
             .limit(5);
 
-        // 4. Recent Transactions
-        const recentBills = await Bill.find({ tenantId })
-            .sort({ createdAt: -1 })
-            .limit(5)
-            .populate('customer', 'name');
+        // 5. Graph Data (Last 7 Days)
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const dailySales = await Bill.aggregate([
+            { $match: { tenantId, createdAt: { $gte: sevenDaysAgo } } },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    amount: { $sum: "$grandTotal" }
+                }
+            },
+            { $sort: { "_id": 1 } }
+        ]);
 
         res.json({
             totalSales: salesStats[0]?.totalSales || 0,
@@ -43,7 +51,8 @@ const getDashboardStats = async (req, res) => {
             customerCount,
             productCount,
             lowStockProducts,
-            recentBills
+            recentBills,
+            dailySales
         });
 
     } catch (error) {
